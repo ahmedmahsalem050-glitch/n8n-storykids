@@ -1,4 +1,11 @@
+FROM alpine:3.19 AS ffmpeg-builder
+RUN apk add --no-cache ffmpeg
+
 FROM n8nio/n8n:latest
 USER root
-RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/lists/*
+COPY --from=ffmpeg-builder /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=ffmpeg-builder /usr/bin/ffprobe /usr/bin/ffprobe
+COPY --from=ffmpeg-builder /usr/lib/libav* /usr/lib/
+COPY --from=ffmpeg-builder /usr/lib/libsw* /usr/lib/
+COPY --from=ffmpeg-builder /usr/lib/libpostproc* /usr/lib/
 USER node
